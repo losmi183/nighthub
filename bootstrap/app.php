@@ -22,16 +22,46 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function ($exceptions) {
         $exceptions->render(function (Throwable $e, Request $request) {
             if ($request->is('api/*')) {
-                return response()->json([
-                    'error'     => true,
-                    'exception' => class_basename($e),
-                    'message'   => $e->getMessage(), // tekst poruke
-                    'file'      => $e->getFile(),    // fajl gde je exception
-                    'line'      => $e->getLine(),    // linija gde je exception
-                    'trace'     => app()->isLocal() ? $e->getTrace() : [],
-                ], 500);
-            }
 
+                // Default status i poruka
+                $status = 500;
+                $message = 'Server error';
+
+                // Razlikovanje tipa exception-a
+                if ($e instanceof \Illuminate\Auth\AuthenticationException) {
+                    $status = 401;
+                    $message = 'Unauthenticated';
+                } elseif ($e instanceof \Illuminate\Validation\ValidationException) {
+                    $status = 422;
+                    $message = $e->errors(); // detalji validacije
+                } elseif ($e instanceof \Symfony\Component\HttpKernel\Exception\HttpException) {
+                    $status = $e->getStatusCode(); // status iz HttpException
+                    $message = $e->getMessage();
+                } else {
+                    $status = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : 500;
+                    $message = $e->getMessage();
+                }
+
+                // Dev mode -> full debug info
+                if(app()->environment('local')) {
+                    return response()->json([
+                        'error'     => true,
+                        'exception' => class_basename($e),
+                        'message'   => $e->getMessage(),
+                        'file'      => $e->getFile(),
+                        'line'      => $e->getLine(),
+                        'trace'     => $e->getTrace(),
+                    ], $status);
+                }
+
+                // Production -> samo minimalna poruka
+                if(app()->environment('production')) {
+                    return response()->json([
+                        'error'   => true,
+                        'message' => $message,
+                    ], $status);
+                }
+            }
             return null;
         });
     })

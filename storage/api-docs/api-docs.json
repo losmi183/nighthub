@@ -10,6 +10,10 @@
     },
     "servers": [
         {
+            "url": "http://165.232.113.33/api",
+            "description": "Dev server"
+        },
+        {
             "url": "http://nighthub.test/api",
             "description": "Dev server"
         }

@@ -9,8 +9,10 @@ use OpenApi\Attributes as OA;
 use App\Services\AuthServices;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RefreshRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\GoogleLoginRequest;
+use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Requests\ForgotPasswordRequest;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -166,9 +168,9 @@ class AuthController extends Controller
             new OA\Response(response: Response::HTTP_INTERNAL_SERVER_ERROR, description: 'Server Error')
         ]
     )]
-    public function refresh(Request $request): JsonResponse
+    public function refresh(RefreshRequest $request): JsonResponse
     {
-        $refresh_token = $request->refresh_token;
+        $refresh_token = $request->validated('refresh_token');
 
         $result = $this->authServices->refresh($refresh_token);
 
@@ -267,11 +269,11 @@ class AuthController extends Controller
         return response()->json(['messsage' => 'reset link sent to email']);
     }
 
-    public function resetPassword(Request $request): JsonResponse
+    public function resetPassword(ResetPasswordRequest $request): JsonResponse
     {
-        $forgot_password_token = $request->query('forgot_password_token');
+        $data = $request->validated();
 
-        $result = $this->authServices->resetPassword($forgot_password_token);
+        $result = $this->authServices->resetPassword($data);
         return response()->json(['messsage' => 'reset link sent to email']);
     }
 }

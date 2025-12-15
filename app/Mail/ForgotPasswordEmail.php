@@ -29,11 +29,11 @@ class ForgotPasswordEmail extends Mailable
         $this->email = $user->email ?? "";
 
         $frontendUrl = env('APP_ENV') === 'production' 
-            ? env('BACKEND_PROD') 
-            : env('BACKEND_DEV');
+            ? env('FRONTEND_PROD') 
+            : env('FRONTEND_DEV');
         
                 // 2. Create verification URL
-        $this->resetUrl = $frontendUrl . '/api/auth/reset-password?forgot_password_token=' . $forgotPasswordToken;
+        $this->resetUrl = $frontendUrl . '/reset-password/' . $forgotPasswordToken;
 
     }
 

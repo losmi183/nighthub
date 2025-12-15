@@ -109,9 +109,7 @@ class AuthServices {
 
         $user = User::where('email', $email)->first();
 
-        $token = $this->jwtServices->createJWT($user, 60000);
-        return $token;
-                
+        return redirect()->away(env('FRONTEND_DEV') . 'login?status=email_verified');     
     }
 
     /**
@@ -186,9 +184,9 @@ class AuthServices {
         return true;
     }
 
-    public function resetPassword(string $forgot_password_token)
+    public function resetPassword(array $data)
     {
-        $status = $this->jwtServices->decodeJWT($forgot_password_token);
+        $status = $this->jwtServices->decodeJWT($data['forgot_password_token']);
         if ($status == 403) {
             abort( 403, 'Token has expired');
         }
@@ -198,7 +196,12 @@ class AuthServices {
 
         $userData = $this->jwtServices->getContent(); 
 
-        $email = $userData['email'];
+        try {
+            \DB::table('users')->where('email', $userData['email'])->update(['password' => bcrypt($data['password'])]);
+        } catch (Throwable $th) {
+            Log::error($th->getMessage());
+            abort(400, 'Password not reset');
+        }
     }
 
     // public function googleLogin(?string $idToken): string

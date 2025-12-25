@@ -24,7 +24,7 @@ class Conversation extends Model
             ->with([
                 'users' => function($q) use ($user_id) {
                     $q->where('users.id', '!=', $user_id)
-                    ->select('users.id', 'users.name', 'conversation_user.last_read_message_id');
+                    ->select('users.id', 'users.name', 'users.avatar', 'conversation_user.last_read_message_id');
                 }
             ]);
     }

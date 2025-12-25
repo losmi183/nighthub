@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Crypt-talk'),
+    'name' => env('APP_NAME', 'crypt-talk'),
 
     /*
     |--------------------------------------------------------------------------
@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', 'http://crypt-talk.test'),
 
     /*
     |--------------------------------------------------------------------------

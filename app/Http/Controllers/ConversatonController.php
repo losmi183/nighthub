@@ -42,7 +42,6 @@ class ConversatonController extends Controller
              
         $result = $this->conversationServices->index();
         return response()->json($result);
-
     }
 
     public function startConversation(Request $request): JsonResponse {
